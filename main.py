@@ -15,10 +15,14 @@ def reachable(graph, start_node):
       the set of nodes reachable from start_node
     """
     result = set([start_node])
-    frontier = set([start_node])
+    frontier = [start_node]
     while len(frontier) != 0:
-        ###TODO
-        pass
+        node = frontier.pop(0)
+        result.add(node)
+        for next in graph[node]:
+            if next in result:
+                continue
+            frontier.append(next)
     return result
 
 def test_reachable():
@@ -29,12 +33,20 @@ def test_reachable():
     assert sorted(reachable(graph, 'A')) == ['A', 'B', 'C', 'D']
     assert sorted(reachable(graph, 'E')) == ['E', 'F', 'G']
 
-
+test_reachable()
 
 
 def connected(graph):
     ### TODO
-    pass
+    lst = list(graph.keys())
+    res = reachable(graph,lst[0])
+    for node in graph.keys():
+        temp = reachable(graph, node)
+        if temp != res:
+            return False
+        res = temp
+    return True
+
 
 def test_connected():
     graph = make_undirected_graph([('A', 'B'), ('B', 'C'), ('C', 'D'), ('D', 'B')])
@@ -42,7 +54,7 @@ def test_connected():
     graph = make_undirected_graph([('A', 'B'), ('B', 'C'), ('C', 'D'), ('D', 'B'), ('E', 'F'), ('F', 'G')])
     assert connected(graph) == False
 
-
+test_connected()
 
 def n_components(graph):
     """
@@ -50,7 +62,18 @@ def n_components(graph):
       the number of connected components in an undirected graph
     """
     ### TODO
-    pass
+    if connected(graph):
+        return 1
+    lst = list(graph.keys())
+    first = list(reachable(graph,lst[0]))
+    res = 1
+    for node in graph.keys():
+        if node in first:
+            continue
+        res += 1
+        first += list(reachable(graph, node))
+    return res
+        
 
 def test_n_components():
     graph = make_undirected_graph([('A', 'B'), ('B', 'C'), ('C', 'D'), ('D', 'B')])
@@ -58,3 +81,5 @@ def test_n_components():
 
     graph = make_undirected_graph([('A', 'B'), ('B', 'C'), ('C', 'D'), ('D', 'B'), ('E', 'F'), ('F', 'G')])
     assert n_components(graph) == 2
+
+test_n_components()
